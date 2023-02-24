@@ -1,0 +1,19 @@
+<svg width="23.999999999999996" height="23.999999999999996" xmlns="http://www.w3.org/2000/svg">
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="402" width="582" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g transform="rotate(180, 11.777, 15.8662)" id="Bounding_Box">
+   <rect x="-0.223048" y="3.866171" id="svg_1" height="24" width="24" fill="none"/>
+  </g>
+  <g transform="rotate(90, 12.25, 12)" id="Master">
+   <g id="svg_2">
+    <polygon id="svg_3" points="15.5,5 11,5 16,12 11,19 15.5,19 20.5,12   "/>
+    <polygon id="svg_4" points="8.5,5 4,5 9,12 4,19 8.5,19 13.5,12   "/>
+   </g>
+  </g>
+ </g>
+</svg>
