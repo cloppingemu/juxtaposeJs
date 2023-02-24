@@ -107,6 +107,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup lang="ts">
@@ -168,11 +169,20 @@ function toggle_loop() {
 }
 
 function go_to_start() {
+  let seek_target = 0
+  if (playback_state.looping) {
+    seek_target = loop_range.value[0]
+  }
   (track_cards.value as typeof_track_cards).forEach((card) => {
-    card.update_seek_pos(0)
+    card.update_seek_pos(seek_target)
   })
   tracks.forEach((track) => {
-    track.audio.currentTime = 0
+    const seek_time = Math.min(
+      track.audio.duration,
+      max_track_duration * seek_target / SEEK_PRECISION
+    )
+    console.log(seek_time)
+    track.audio.currentTime = seek_time
   })
 }
 
@@ -238,13 +248,13 @@ function change_seek(seek_to: number) {
 
 function change_track(new_track_index: number) {
   tracks[active_track_index.value].audio.pause()
-  if (playback_state.playing) {
-    tracks[new_track_index].audio.play()
-  }
   tracks[new_track_index].audio.currentTime = Math.min(
     tracks[active_track_index.value].audio.currentTime,
     tracks[new_track_index].audio.duration
   )
+  if (playback_state.playing) {
+    tracks[new_track_index].audio.play()
+  }
   active_track_index.value = new_track_index
 }
 

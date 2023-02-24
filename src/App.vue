@@ -2,6 +2,7 @@
   <v-app>
     <v-main>
       <MainBody @flash_error="handle_error" />
+      <div class="diversions"><a href="https://github.com/cloppingemu/juxtaposeJs" target="_blank">@Github</a></div>
       <div class="flash-error" ref="error_bar">
         <b>{{ msg }}</b>
       </div>
@@ -84,5 +85,17 @@ function handle_error(message: string) {
   padding: 1em;
   z-index: 10;
   transition: bottom 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.diversions {
+  margin-top: 5em;
+  font-weight: bold;
+}
+.diversions > a {
+  text-decoration: none;
+  color: var(--color-1);
+}
+.diversions > a:hover {
+  color: #3fb27f;
 }
 </style>

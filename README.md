@@ -1,5 +1,5 @@
 # juxtaposeJs
-Simple audio comparision web-app. Available at juxtapose.pages.dev.
+Simple audio comparision web-app. Available at [juxtapose.pages.dev](https://juxtapose.pages.dev).
 
 
 ## Project setup
