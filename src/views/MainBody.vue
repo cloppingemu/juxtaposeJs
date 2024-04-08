@@ -119,7 +119,7 @@ import { SEEK_PRECISION, format_time } from '../App.vue'
 import trackCard from '../components/trackCard.vue'
 
 onMounted(() => {
-  window.onkeydown = ((e: KeyboardEvent) => {
+  document.onkeydown = ((e: KeyboardEvent) => {
     if (e.target == document.body) {
       switch (e.key.toLocaleLowerCase()) {
         case "z": {
@@ -240,13 +240,14 @@ function remove_track(track_index: number) {
     max_track_duration = 0
     return
   }
-  const removed = tracks.splice(track_index, 1)
+  const removed = tracks.splice(track_index, 1)[0]
   if (active_track_index.value > track_index)  {
     active_track_index.value = active_track_index.value - 1;
   } else if (active_track_index.value == tracks.length) {
     active_track_index.value = tracks.length - 1
   }
-  removed[0].audio.pause()
+  removed.audio.pause()
+  change_seek(removed.audio.currentTime)
   if (playback_state.playing) {
     tracks[active_track_index.value].audio.play()
   }
@@ -282,12 +283,12 @@ function toggle_playback() {
   if (!tracks.length) {
     return
   }
+
+  const active_track = tracks[active_track_index.value].audio
   if (playback_state.playing) {
-    playpause_img.value = PLAY_IMG_NAME
-    tracks[active_track_index.value].audio.pause()
+    active_track.pause()
   } else {
-    playpause_img.value = PAUSE_IMG_NAME
-    tracks[active_track_index.value].audio.play()
+    active_track.play()
   }
   playback_state.playing = !playback_state.playing
 }
@@ -338,6 +339,18 @@ function load_track() {
 
 function add_track(fname: File, title: string) {
   const a = new Audio(URL.createObjectURL(fname))
+
+  a.onplay = () => {
+    console.log("play")
+    playpause_img.value = PAUSE_IMG_NAME
+    playback_state.playing = true
+  }
+  a.onpause = () => {
+    console.log("pause")
+    playpause_img.value = PLAY_IMG_NAME
+    playback_state.playing = false
+  }
+
   a.onloadeddata = (() => {
     tracks.push({ audio: a, title: title })
     max_track_duration = Math.max(max_track_duration, a.duration)
