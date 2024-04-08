@@ -155,44 +155,27 @@ onMounted(() => {
   })
 })
 
+const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
 
+const emit = defineEmits(["flash_error"])
+
+const glob = import.meta.glob('@/assets/*.png', { eager: true })
+const PlayPauseImgs = Object.fromEntries(
+  Object.entries(glob).map(([k, v]) => [filename(k), v.default])
+)
 
 const PAUSE_IMG_NAME = "pause"
 const PLAY_IMG_NAME = "play"
 
-const glob = [
-  `/src/assets/${PAUSE_IMG_NAME}.png`,
-  `/src/assets/${PLAY_IMG_NAME}.png`,
-]
-const PlayPauseImgs = Object.fromEntries(
-  glob.map((k) => [filename(k), k])
-)
-
-
-const emit = defineEmits(["flash_error"])
-
-const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
 const playpause_img = ref(PLAY_IMG_NAME)
 
 type typeof_track_cards = InstanceType<typeof trackCard>[]
 const track_cards = ref<typeof_track_cards | null>(null)
 
-const track_adder = ref<HTMLInputElement | null>(null)
-const track_title = ref<HTMLInputElement | null>(null)
-
-const active_track_index = ref<number>(0)
-
-
 const playback_state = reactive({
   playing: false,
   looping: false
 })
-
-const tracks = reactive<{
-  audio: HTMLAudioElement,
-  title: string,
-}[]>([])
-
 
 function toggle_loop() {
   if (!tracks.length) {
@@ -219,6 +202,11 @@ function go_to_start() {
   })
 }
 
+const active_track_index = ref<number>(0)
+const tracks = reactive<{
+  audio: HTMLAudioElement,
+  title: string,
+}[]>([])
 let max_track_duration = 0
 
 // function export_config() {
@@ -303,6 +291,8 @@ function toggle_playback() {
   playback_state.playing = !playback_state.playing
 }
 
+const track_adder = ref<HTMLInputElement | null>(null)
+const track_title = ref<HTMLInputElement | null>(null)
 
 function track_selected() {
   if (!track_adder.value || !track_adder.value.files || track_adder.value.files.length == 0) {
