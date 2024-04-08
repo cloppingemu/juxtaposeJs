@@ -120,35 +120,41 @@ import trackCard from '../components/trackCard.vue'
 
 onMounted(() => {
   document.onkeydown = ((e: KeyboardEvent) => {
-    if (e.target == document.body) {
-      switch (e.key.toLocaleLowerCase()) {
-        case "z": {
-          go_to_start()
-          break
-        }
-        case "x": {
-          toggle_playback()
-          break
-        }
-        case "c": {
-          toggle_loop()
-          break
-        }
-        case "j": {
-          change_track((active_track_index.value + 1) % tracks.length)
-          break
-        }
-        case "k": {
-          change_track((active_track_index.value + tracks.length - 1) % tracks.length)
-          break
-        }
-        case "d": {
-          remove_track(active_track_index.value)
-          break
-        }
-        case "?": {
-          emit("flash_error", "z-Goto start  x-Play/Pause  c-Toogle loop  j-Next track  k-Previous Track  d-Remove track")
-          break
+    const key = e.key.toLocaleLowerCase()
+    const keyNum = parseInt(key)
+    switch (true) {
+      case (key == "z"): {
+        go_to_start()
+        break
+      }
+      case (key == "x"): {
+        toggle_playback()
+        break
+      }
+      case (key == "c"): {
+        toggle_loop()
+        break
+      }
+      case (key == "j"): {
+        change_track((active_track_index.value + 1) % tracks.length)
+        break
+      }
+      case (key == "k"): {
+        change_track((active_track_index.value + tracks.length - 1) % tracks.length)
+        break
+      }
+      case (key == "d"): {
+        remove_track(active_track_index.value)
+        break
+      }
+      case (key == "?"): {
+        emit("flash_error", "z-Goto start  x-Play/Pause  c-Toogle loop  j-Next track  k-Previous Track  d-Remove track")
+        break
+      }
+      case (0 < keyNum && keyNum <= 9): {
+        if (tracks.length+1 >= keyNum) {
+          console.log(`go to ${keyNum-1}`)
+          change_track(keyNum-1)
         }
       }
     }
@@ -341,12 +347,10 @@ function add_track(fname: File, title: string) {
   const a = new Audio(URL.createObjectURL(fname))
 
   a.onplay = () => {
-    console.log("play")
     playpause_img.value = PAUSE_IMG_NAME
     playback_state.playing = true
   }
   a.onpause = () => {
-    console.log("pause")
     playpause_img.value = PLAY_IMG_NAME
     playback_state.playing = false
   }
