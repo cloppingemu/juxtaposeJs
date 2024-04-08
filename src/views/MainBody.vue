@@ -14,12 +14,12 @@
             @click="go_to_start"
             src="../assets/lt.png"
             class="control-icon">
-            <span class="noselect">Go to start</span>
+            <span class="noselect">Go to start (z)</span>
           </span>
           <span class="tooltip">
             <img :src="playpause_img" class="control-icon" @click="toggle_playback()">
             <span class="noselect">
-              {{ playback_state.playing ? "Pause" : "Play" }}
+              {{ playback_state.playing ? "Pause (x)" : "Play (x)" }}
             </span>
           </span>
           <!-- <span class="tooltip">
@@ -35,7 +35,7 @@
             src="../assets/repeat.png"
             :class="{'control-icon': true,
                       'control-active': playback_state.looping}" />
-            <span class="noselect">Toggle loop</span>
+            <span class="noselect">Toggle loop (c)</span>
           </span>
         </div>
       </div>
@@ -48,11 +48,12 @@
           :min="0"
           :max="SEEK_PRECISION"
           :thumb-size="12"
+          :ripple="false"
           v-model="loop_range"
           ></v-range-slider>
         </div>
         <div v-if="playback_state.looping"
-         style="margin-bottom: 1em;">
+        style="margin-bottom: 1em;">
           {{
             loop_range.map(
               v => format_time(
@@ -66,22 +67,22 @@
           }}
         </div>
       </div>
-      
+
     </div>
-    
+
     <div class="card" v-for="(track, index) in tracks">
       <trackCard :title="track.title"
-                :track_index="index"
-                :track_length="track.audio.duration"
-                :track_active="active_track_index == index"
-                :track_width="scale_duration(track.audio.duration)"
-                @track_change="change_track(index)"
-                @seek_mouse_event="seek_mouse_action"
-                @request_seek="change_seek"
-                @remove_track="remove_track"
-                @swap_cards="swap_cards"
-                :num_tracks="tracks.length"
-                ref="track_cards" />
+      :track_index="index"
+      :track_length="track.audio.duration"
+      :track_active="active_track_index == index"
+      :track_width="scale_duration(track.audio.duration)"
+      @track_change="change_track(index)"
+      @seek_mouse_event="seek_mouse_action"
+      @request_seek="change_seek"
+      @remove_track="remove_track"
+      @swap_cards="swap_cards"
+      :num_tracks="tracks.length"
+      ref="track_cards" />
     </div>
 
     <div class="card tracks-card">
@@ -120,22 +121,32 @@ onMounted(() => {
   window.onkeydown = ((e: KeyboardEvent) => {
     if (e.target == document.body) {
       switch (e.key) {
-        case "j":
         case "z": {
           go_to_start()
           break
         }
-        case " ": {
-          e.preventDefault()
-        }
-        case "k":
         case "x": {
           toggle_playback()
           break
         }
-        case "c":
-        case "l": {
+        case "c": {
           toggle_loop()
+          break
+        }
+        case "j": {
+          change_track((active_track_index.value + 1) % tracks.length)
+          break
+        }
+        case "k": {
+          change_track((active_track_index.value + tracks.length - 1) % tracks.length)
+          break
+        }
+        case "d": {
+          remove_track(active_track_index.value)
+          break
+        }
+        case "?": {
+          emit("flash_error", "z-Goto start  x-Play/Pause  c-Toogle loop  j-Next track  k-Previous Track  d-Remove track")
           break
         }
       }
@@ -146,7 +157,6 @@ onMounted(() => {
 const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
 
 const emit = defineEmits(["flash_error"])
-// defineProps<{ msg: string }>()
 
 const PAUSE_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABKklEQVR4nO3RwQnAMBADQfff9KaIBCLDCO59sHOOmZmZmZmZmZmZmZmZvV0f323/5/Z3kIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkICYmZmZmZmZmZmZmZmdmT1ozJX3TR5dJQAAAABJRU5ErkJggg=="
 const PLAY_IMG =  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACa0lEQVR4nO2cMW4TURRFr0BCICFR0kIPJUhhA8Am2AIlLSUtW2ALUzsbiBfg1G4tuQC5iKW5CMlFiBRkmzfz73/vHun033OtJGdmFMAYY4wxxhhjjDG5edv6AOZvRgA/ADz3hdGAB38B+ArgUesDVYd3vAbwsfWhKsN7HAC8bH24ivAf7gB8A/C09SErwSNcA/jU+qBV4AleAnjd+sDZ4YnuAXwH8Kz1wbPCM90A+AzgYesPkA3+p0sA71p/iEwwwNG1rzUID/507WsNwlu1/yHgbCXhhA6ufa1B6NrXG4QHXftig/BW7b8644tTBjZw79rXGoR3av/BjF9AeSjgEsBF6wuhAkUcXftag/Bg+dqnqNdVa5/iDtVqnx24q/Rsnx25rvBsnx16mbn22an7rLXPzt1kq30mcZml9pnIMUPtM6FbAF96fZOfiV31WPss4NBT7bOIu15qn8Vcq9c+i3qpWvss7F6x9ltfFAooVfutLwYF9CDQ0D+yoOPCv9Qhof/shU4Y/vlPFU8gDovcOnmBTmBiV765CAl9+x0a+gEVdPQjXGgoVdkRsFNvFG8MRsAOXahWdgTsyLX6w6UI2IG7Xio7Aoo79FTZEVC4st+jIBRz2/NLbhFQxDHDa6ARUMCrLC9KR9ByiE22yo6gxRA3WSs7grnHWGSu7AjmGmJdobIjmHqIXaXKjmDKMYZqlR3BFEOsqlZ2BJFDbKtXdgQRQ4yubJ1BrlzZsZw7xMaVPQ2nDuHKnphTxnBlz8AxQ7iyZ+SYyn4854Gqc98YruxGuLLFcGWL4coW403rAxhjjDHGGGOMMcYghN/TBFU4Q1nPdQAAAABJRU5ErkJggg=="
@@ -222,13 +232,16 @@ function remove_track(track_index: number) {
     playpause_img.value = PLAY_IMG
     max_track_duration = 0
     return
-  } else if (track_index == active_track_index.value) {
-    emit("flash_error", "Can not remove tracks currently selected")
-    return
   }
-  tracks.splice(track_index, 1)
+  const removed = tracks.splice(track_index, 1)
   if (active_track_index.value > track_index)  {
     active_track_index.value = active_track_index.value - 1;
+  } else if (active_track_index.value == tracks.length) {
+    active_track_index.value = tracks.length - 1
+  }
+  removed[0].audio.pause()
+  if (playback_state.playing) {
+    tracks[active_track_index.value].audio.play()
   }
   max_track_duration = Math.max(...tracks.map(t => t.audio.duration))
 }
@@ -277,7 +290,7 @@ const track_title = ref<HTMLInputElement | null>(null)
 
 function track_selected() {
   if (!track_adder.value || !track_adder.value.files || track_adder.value.files.length == 0) {
-    emit("flash_error", "Select file(s) to comare")
+    emit("flash_error", "Select file(s) to compare")
     return
   }
   const fnames = track_adder.value.files
@@ -396,7 +409,7 @@ h3 {
 }
 .input-filename > input:hover {
   cursor: pointer;
-} 
+}
 .input-filename > input:focus {
   border: 1px solid #0000;
   border-bottom: 2px solid #0000;

@@ -4,7 +4,7 @@
       <MainBody @flash_error="handle_error" />
       <div class="diversions"><a href="https://github.com/cloppingemu/juxtaposeJs" target="_blank">@Github</a></div>
       <div class="flash-error" ref="error_bar">
-        <b>{{ msg }}</b>
+        <pre><b>{{ msg }}</b></pre>
       </div>
     </v-main>
   </v-app>
