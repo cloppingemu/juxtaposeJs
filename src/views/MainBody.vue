@@ -151,10 +151,8 @@ onMounted(() => {
         emit("flash_error", "z-Goto start  x-Play/Pause  c-Toogle loop  j-Next track  k-Previous Track  d-Remove track")
         break
       }
-      case (0 < keyNum && keyNum <= 9): {
-        if (tracks.length+1 >= keyNum) {
-          change_track(keyNum-1)
-        }
+      case (0 < keyNum && keyNum <= tracks.length): {
+        change_track(keyNum-1)
       }
     }
   })
