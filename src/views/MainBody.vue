@@ -153,7 +153,6 @@ onMounted(() => {
       }
       case (0 < keyNum && keyNum <= 9): {
         if (tracks.length+1 >= keyNum) {
-          console.log(`go to ${keyNum-1}`)
           change_track(keyNum-1)
         }
       }
@@ -204,7 +203,6 @@ function go_to_start() {
       track.audio.duration,
       max_track_duration * seek_target / SEEK_PRECISION
     )
-    console.log(seek_time)
     track.audio.currentTime = seek_time
   })
 }
