@@ -46,10 +46,15 @@ function handle_error(message: string) {
   border-radius: 10px;
   padding: 0.5em;
   cursor: pointer;
-  transition: background-color 0.25s;
 }
-.control-icon:hover { background-color: #eee; }
-.control-active { background-color: #e3e3e3; }
+.control-icon:hover {
+  background-color: #ddd;
+  opacity: 75%;
+}
+.control-active {
+  background-color: #bbb;
+  opacity: 25%;
+}
 
 .tooltip { outline: none; }
 .tooltip span {

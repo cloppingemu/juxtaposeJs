@@ -3,42 +3,42 @@
     <div class="card-header">
       <span class="tooltip">
         <img
-         src="../assets/listen.png"
-         :class="{'control-icon': true,
-                  'control-active': track_active}"
-         @click="select_track">
+        src="../assets/listen.png"
+        :class="{'control-icon': true,
+                 'control-active': !track_active}"
+        @click="select_track">
         <span class="noselect">Listen</span>
       </span>
       <h3> {{ title }} </h3>
       <span class="spacer"></span>
       <span class="controls">
         <span
-         class="tooltip"
-         :style="{
+        class="tooltip"
+        :style="{
           visibility: track_index != 0 ? 'visible' : 'hidden'
-         }">
+        }">
           <img
-           src="../assets/arrow_up.png"
-           :class="{'control-icon': true}"
-           @click="swap_cards(track_index, track_index - 1)">
+          src="../assets/arrow_up.png"
+          :class="{'control-icon': true}"
+          @click="swap_cards(track_index, track_index - 1)">
           <span class="noselect">Move up</span>
         </span>
         <span
-         class="tooltip"
-         :style="{
+        class="tooltip"
+        :style="{
           visibility: track_index != num_tracks - 1 ? 'visible' : 'hidden'
-         }">
+        }">
           <img
-           src="../assets/arrow_down.png"
-           :class="{'control-icon': true}"
-           @click="swap_cards(track_index, track_index + 1)">
+          src="../assets/arrow_down.png"
+          :class="{'control-icon': true}"
+          @click="swap_cards(track_index, track_index + 1)">
           <span class="noselect">Move down</span>
         </span>
         <span class="tooltip">
           <img
-           src="../assets/cross.png"
-           :class="{'control-icon': true}"
-           @click="remove_track">
+          src="../assets/cross.png"
+          :class="{'control-icon': true}"
+          @click="remove_track">
           <span class="noselect">Remove</span>
         </span>
       </span>
@@ -46,15 +46,15 @@
 
     <div class="seek">
       <v-slider
-       v-model="seek_pos"
-       :min="0"
-       :max="SEEK_PRECISION"
-       @mousedown="seek_md"
-       @mouseup="seek_up"
-       ref="seekbar"
-       :thumb-size="12"
-       :disabled="!track_active"
-       :style="{width: track_width + `%`}">
+      v-model="seek_pos"
+      :min="0"
+      :max="SEEK_PRECISION"
+      @mousedown="seek_md"
+      @mouseup="seek_up"
+      ref="seekbar"
+      :thumb-size="12"
+      :disabled="!track_active"
+      :style="{width: track_width + `%`}">
       </v-slider>
       <span>
         {{ format_time(Math.round(seek_pos * track_length/SEEK_PRECISION)) }} /

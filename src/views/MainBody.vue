@@ -34,7 +34,7 @@
             @click="toggle_loop()"
             src="@/assets/repeat.png"
             :class="{'control-icon': true,
-                      'control-active': playback_state.looping}" />
+                     'control-active': !playback_state.looping}" />
             <span class="noselect">Toggle loop (c)</span>
           </span>
         </div>
@@ -121,7 +121,7 @@ import trackCard from '../components/trackCard.vue'
 onMounted(() => {
   window.onkeydown = ((e: KeyboardEvent) => {
     if (e.target == document.body) {
-      switch (e.key) {
+      switch (e.key.toLocaleLowerCase()) {
         case "z": {
           go_to_start()
           break
@@ -159,7 +159,8 @@ const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
 
 const emit = defineEmits(["flash_error"])
 
-const glob = import.meta.glob('@/assets/*.png', { eager: true })
+type GlobType = { [fname: string]: {default: string} }
+const glob: GlobType = import.meta.glob('@/assets/play-pause/*.png', { eager: true })
 const PlayPauseImgs = Object.fromEntries(
   Object.entries(glob).map(([k, v]) => [filename(k), v.default])
 )
@@ -169,8 +170,8 @@ const PLAY_IMG_NAME = "play"
 
 const playpause_img = ref(PLAY_IMG_NAME)
 
-type typeof_track_cards = InstanceType<typeof trackCard>[]
-const track_cards = ref<typeof_track_cards | null>(null)
+type TrackCards = InstanceType<typeof trackCard>[]
+const track_cards = ref<TrackCards | null>(null)
 
 const playback_state = reactive({
   playing: false,
@@ -189,7 +190,7 @@ function go_to_start() {
   if (playback_state.looping) {
     seek_target = loop_range.value[0]
   }
-  (track_cards.value as typeof_track_cards).forEach((card) => {
+  (track_cards.value as TrackCards).forEach((card) => {
     card.update_seek_pos(seek_target)
   })
   tracks.forEach((track) => {
@@ -224,7 +225,7 @@ function swap_cards(from: number, to: number) {
   } else if (active_track_index.value == to) {
     active_track_index.value = from
   }
-  (track_cards.value as typeof_track_cards).forEach((card, indx) => {
+  (track_cards.value as TrackCards).forEach((card, indx) => {
     card.update_seek_pos(scale_seek(indx, tracks[active_track_index.value].audio.currentTime))
   })
 }
@@ -362,7 +363,7 @@ function add_track(fname: File, title: string) {
         playpause_img.value = PAUSE_IMG_NAME
       }
     }
-    (track_cards.value as typeof_track_cards).forEach((card, indx) => {
+    (track_cards.value as TrackCards).forEach((card, indx) => {
       card.update_seek_pos(scale_seek(indx, a.currentTime))
     })
   })
