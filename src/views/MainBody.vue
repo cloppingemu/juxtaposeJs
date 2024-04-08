@@ -12,7 +12,7 @@
           <span class="tooltip">
             <img
             @click="go_to_start"
-            src="../assets/lt.png"
+            src="@/assets/lt.png"
             class="control-icon">
             <span class="noselect">Go to start (z)</span>
           </span>
@@ -25,14 +25,14 @@
           <!-- <span class="tooltip">
             <img
             @click="go_to_end"
-            src="../assets/ff.png"
+            src="@/assets/ff.png"
             class="control-icon">
             <span class="noselect">Go to end</span>
           </span> -->
           <span class="tooltip">
             <img
             @click="toggle_loop()"
-            src="../assets/repeat.png"
+            src="@/assets/repeat.png"
             :class="{'control-icon': true,
                       'control-active': playback_state.looping}" />
             <span class="noselect">Toggle loop (c)</span>
@@ -158,8 +158,8 @@ const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
 
 const emit = defineEmits(["flash_error"])
 
-const PAUSE_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAABKklEQVR4nO3RwQnAMBADQfff9KaIBCLDCO59sHOOmZmZmZmZmZmZmZmZvV0f323/5/Z3kIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkIBsBQnIVpCAbAUJyFaQgGwFCchWkICYmZmZmZmZmZmZmZmdmT1ozJX3TR5dJQAAAABJRU5ErkJggg=="
-const PLAY_IMG =  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACa0lEQVR4nO2cMW4TURRFr0BCICFR0kIPJUhhA8Am2AIlLSUtW2ALUzsbiBfg1G4tuQC5iKW5CMlFiBRkmzfz73/vHun033OtJGdmFMAYY4wxxhhjjDG5edv6AOZvRgA/ADz3hdGAB38B+ArgUesDVYd3vAbwsfWhKsN7HAC8bH24ivAf7gB8A/C09SErwSNcA/jU+qBV4AleAnjd+sDZ4YnuAXwH8Kz1wbPCM90A+AzgYesPkA3+p0sA71p/iEwwwNG1rzUID/507WsNwlu1/yHgbCXhhA6ufa1B6NrXG4QHXftig/BW7b8644tTBjZw79rXGoR3av/BjF9AeSjgEsBF6wuhAkUcXftag/Bg+dqnqNdVa5/iDtVqnx24q/Rsnx25rvBsnx16mbn22an7rLXPzt1kq30mcZml9pnIMUPtM6FbAF96fZOfiV31WPss4NBT7bOIu15qn8Vcq9c+i3qpWvss7F6x9ltfFAooVfutLwYF9CDQ0D+yoOPCv9Qhof/shU4Y/vlPFU8gDovcOnmBTmBiV765CAl9+x0a+gEVdPQjXGgoVdkRsFNvFG8MRsAOXahWdgTsyLX6w6UI2IG7Xio7Aoo79FTZEVC4st+jIBRz2/NLbhFQxDHDa6ARUMCrLC9KR9ByiE22yo6gxRA3WSs7grnHWGSu7AjmGmJdobIjmHqIXaXKjmDKMYZqlR3BFEOsqlZ2BJFDbKtXdgQRQ4yubJ1BrlzZsZw7xMaVPQ2nDuHKnphTxnBlz8AxQ7iyZ+SYyn4854Gqc98YruxGuLLFcGWL4coW403rAxhjjDHGGGOMMcYghN/TBFU4Q1nPdQAAAABJRU5ErkJggg=="
+const PAUSE_IMG = "/src/assets/pause.png"
+const PLAY_IMG = "/src/assets/pause.png"
 
 const playpause_img = ref(PLAY_IMG)
 
