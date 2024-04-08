@@ -17,7 +17,7 @@
             <span class="noselect">Go to start (z)</span>
           </span>
           <span class="tooltip">
-            <img :src="playpause_img" class="control-icon" @click="toggle_playback()">
+            <img :src="PlayPauseImgs[playpause_img]" class="control-icon" @click="toggle_playback()">
             <span class="noselect">
               {{ playback_state.playing ? "Pause (x)" : "Play (x)" }}
             </span>
@@ -112,6 +112,7 @@
 </template>
 
 <script setup lang="ts">
+import { filename } from 'pathe/utils'
 import { reactive, ref, onMounted } from 'vue'
 import { SEEK_PRECISION, format_time } from '../App.vue'
 
@@ -154,22 +155,44 @@ onMounted(() => {
   })
 })
 
-const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
+
+
+const PAUSE_IMG_NAME = "pause"
+const PLAY_IMG_NAME = "play"
+
+const glob = [
+  `/src/assets/${PAUSE_IMG_NAME}.png`,
+  `/src/assets/${PLAY_IMG_NAME}.png`,
+]
+const PlayPauseImgs = Object.fromEntries(
+  glob.map((k) => [filename(k), k])
+)
+
 
 const emit = defineEmits(["flash_error"])
 
-const PAUSE_IMG = "/src/assets/pause.png"
-const PLAY_IMG = "/src/assets/pause.png"
-
-const playpause_img = ref(PLAY_IMG)
+const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
+const playpause_img = ref(PLAY_IMG_NAME)
 
 type typeof_track_cards = InstanceType<typeof trackCard>[]
 const track_cards = ref<typeof_track_cards | null>(null)
+
+const track_adder = ref<HTMLInputElement | null>(null)
+const track_title = ref<HTMLInputElement | null>(null)
+
+const active_track_index = ref<number>(0)
+
 
 const playback_state = reactive({
   playing: false,
   looping: false
 })
+
+const tracks = reactive<{
+  audio: HTMLAudioElement,
+  title: string,
+}[]>([])
+
 
 function toggle_loop() {
   if (!tracks.length) {
@@ -196,11 +219,6 @@ function go_to_start() {
   })
 }
 
-const active_track_index = ref<number>(0)
-const tracks = reactive<{
-  audio: HTMLAudioElement,
-  title: string,
-}[]>([])
 let max_track_duration = 0
 
 // function export_config() {
@@ -229,7 +247,7 @@ function remove_track(track_index: number) {
     tracks.splice(track_index, 1)
     playback_state.playing = false
     playback_state.looping = false
-    playpause_img.value = PLAY_IMG
+    playpause_img.value = PLAY_IMG_NAME
     max_track_duration = 0
     return
   }
@@ -276,17 +294,15 @@ function toggle_playback() {
     return
   }
   if (playback_state.playing) {
-    playpause_img.value = PLAY_IMG
+    playpause_img.value = PLAY_IMG_NAME
     tracks[active_track_index.value].audio.pause()
   } else {
-    playpause_img.value = PAUSE_IMG
+    playpause_img.value = PAUSE_IMG_NAME
     tracks[active_track_index.value].audio.play()
   }
   playback_state.playing = !playback_state.playing
 }
 
-const track_adder = ref<HTMLInputElement | null>(null)
-const track_title = ref<HTMLInputElement | null>(null)
 
 function track_selected() {
   if (!track_adder.value || !track_adder.value.files || track_adder.value.files.length == 0) {
@@ -342,7 +358,7 @@ function add_track(fname: File, title: string) {
       return
     }
     playback_state.playing = false
-    playpause_img.value = PLAY_IMG
+    playpause_img.value = PLAY_IMG_NAME
   })
   a.ontimeupdate = (() => {
     if (seek_mouse_down) {
@@ -353,7 +369,7 @@ function add_track(fname: File, title: string) {
         a.currentTime = loop_range.value[0] * max_track_duration / SEEK_PRECISION
         a.play()
         playback_state.playing = true
-        playpause_img.value = PAUSE_IMG
+        playpause_img.value = PAUSE_IMG_NAME
       }
     }
     (track_cards.value as typeof_track_cards).forEach((card, indx) => {
