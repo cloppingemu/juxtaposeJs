@@ -29,12 +29,12 @@ onMounted(() => {
   error_bar.value!.style.bottom = `-${error_bar.value!.scrollHeight}px`
 })
 
-function handle_error(message: string) {
+function handle_error(message: string, timeout: number) {
   msg.value = message
   error_bar.value!.style.bottom = '0px'
   setTimeout(() => {
     error_bar.value!.style.bottom = `-${error_bar.value!.scrollHeight}px`
-  }, 5000)
+  }, timeout)
 }
 
 </script>
@@ -53,7 +53,7 @@ function handle_error(message: string) {
 }
 .control-active {
   background-color: #bbb;
-  opacity: 25%;
+  opacity: 50%;
 }
 
 .tooltip { outline: none; }

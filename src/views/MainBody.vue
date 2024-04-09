@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="noselect">
     <h1>Juxtapose: <br />
       Compare Audio</h1>
 
@@ -14,28 +14,21 @@
             @click="go_to_start"
             src="@/assets/lt.png"
             class="control-icon">
-            <span class="noselect">Go to start (z)</span>
+            <span class="noselect">Go to start (z/y)</span>
           </span>
           <span class="tooltip">
             <img :src="PlayPauseImgs[playpause_img]" class="control-icon" @click="toggle_playback()">
             <span class="noselect">
-              {{ playback_state.playing ? "Pause (x)" : "Play (x)" }}
+              {{ playback_state.playing ? "Pause (x/u)" : "Play (x/u)" }}
             </span>
           </span>
-          <!-- <span class="tooltip">
-            <img
-            @click="go_to_end"
-            src="@/assets/ff.png"
-            class="control-icon">
-            <span class="noselect">Go to end</span>
-          </span> -->
           <span class="tooltip">
             <img
             @click="toggle_loop()"
             src="@/assets/repeat.png"
             :class="{'control-icon': true,
                      'control-active': !playback_state.looping}" />
-            <span class="noselect">Toggle loop (c)</span>
+            <span class="noselect">Toggle loop (c/i)</span>
           </span>
         </div>
       </div>
@@ -92,7 +85,7 @@
         type="file"
         accept=".wav,.mp3"
         ref="track_adder"
-        @change="track_selected()"
+        @change="track_selected"
         multiple
         />
         <div class="file-adder-hint noselect"><span>Or drag and drop files here</span></div>
@@ -104,7 +97,6 @@
       </div>
       <div>
         <button @click="load_track">Add</button>
-        <!-- <button @click="export_config">Export</button> -->
       </div>
     </div>
   </div>
@@ -117,46 +109,6 @@ import { reactive, ref, onMounted } from 'vue'
 import { SEEK_PRECISION, format_time } from '../App.vue'
 
 import trackCard from '../components/trackCard.vue'
-
-onMounted(() => {
-  document.onkeydown = ((e: KeyboardEvent) => {
-    const key = e.key.toLocaleLowerCase()
-    const keyNum = parseInt(key)
-    switch (true) {
-      case (key == "z"): {
-        go_to_start()
-        break
-      }
-      case (key == "x"): {
-        toggle_playback()
-        break
-      }
-      case (key == "c"): {
-        toggle_loop()
-        break
-      }
-      case (key == "j"): {
-        change_track((active_track_index.value + 1) % tracks.length)
-        break
-      }
-      case (key == "k"): {
-        change_track((active_track_index.value + tracks.length - 1) % tracks.length)
-        break
-      }
-      case (key == "d"): {
-        remove_track(active_track_index.value)
-        break
-      }
-      case (key == "?"): {
-        emit("flash_error", "z-Goto start  x-Play/Pause  c-Toogle loop  j-Next track  k-Previous Track  d-Remove track")
-        break
-      }
-      case (0 < keyNum && keyNum <= tracks.length): {
-        change_track(keyNum-1)
-      }
-    }
-  })
-})
 
 const loop_range = ref<[number, number]>([0, SEEK_PRECISION])
 
@@ -179,6 +131,15 @@ const track_cards = ref<TrackCards | null>(null)
 const playback_state = reactive({
   playing: false,
   looping: false
+})
+
+onMounted(() => {
+  document.onkeydown = ((e: KeyboardEvent) => {
+    const key = e.key.toLocaleLowerCase()
+    if (tracks.length && handleKeypress(key)) {
+      e.preventDefault()
+    }
+  })
 })
 
 function toggle_loop() {
@@ -211,14 +172,6 @@ const tracks = reactive<{
   title: string,
 }[]>([])
 let max_track_duration = 0
-
-// function export_config() {
-//   console.log(track_adder.value &&
-//               track_adder.value.files,
-//               track_adder.value &&
-//               track_adder.value.files &&
-//               track_adder.value.files.length)
-// }
 
 function swap_cards(from: number, to: number) {
   tracks.splice(to, 0, ...tracks.splice(from, 1))
@@ -270,6 +223,9 @@ function change_seek(seek_to: number) {
 }
 
 function change_track(new_track_index: number) {
+  if (active_track_index.value == new_track_index) {
+    return
+  }
   tracks[active_track_index.value].audio.pause()
   tracks[new_track_index].audio.currentTime = Math.min(
     tracks[active_track_index.value].audio.currentTime,
@@ -299,8 +255,8 @@ const track_adder = ref<HTMLInputElement | null>(null)
 const track_title = ref<HTMLInputElement | null>(null)
 
 function track_selected() {
-  if (!track_adder.value || !track_adder.value.files || track_adder.value.files.length == 0) {
-    emit("flash_error", "Select file(s) to compare")
+  if (!track_adder.value || !track_adder.value.files || !track_adder.value.files.length) {
+    emit("flash_error", "Select file(s) to compare", 5_000)
     return
   }
   const fnames = track_adder.value.files
@@ -323,12 +279,12 @@ function track_selected() {
 function load_track() {
   const fname = track_adder.value?.files
   if (!fname?.length) {
-    emit("flash_error", "Select a wav or mp3 file to compare")
+    emit("flash_error", "Select a wav or mp3 file to compare", 5_000)
     return
   }
   const title = track_title.value?.value
   if (!title) {
-    emit("flash_error", "Title can not be empty")
+    emit("flash_error", "Title can not be empty", 5_000)
     track_title.value!.focus()
     return
   }
@@ -339,8 +295,8 @@ function load_track() {
   track_title.value!.value = ""
 }
 
-function add_track(fname: File, title: string) {
-  const a = new Audio(URL.createObjectURL(fname))
+function add_track(fobj: File, title: string) {
+  const a = new Audio(URL.createObjectURL(fobj))
 
   a.onplay = () => {
     playpause_img.value = PAUSE_IMG_NAME
@@ -386,6 +342,79 @@ function scale_seek(track_index: number, seek_pos: number) {
   return (Math.min(seek_pos, tracks[track_index].audio.duration) /
           tracks[track_index].audio.duration * SEEK_PRECISION)
 }
+
+function handleKeypress(key: string) {
+    const keyNum = parseInt(key)
+    switch (true) {
+    case (key == "z"):
+    case (key == "y"):
+    {
+      go_to_start()
+      break
+    }
+    case (key == " "):
+    case (key == "x"):
+    case (key == "u"):
+    {
+      toggle_playback()
+      break
+    }
+    case (key == "c"):
+    case (key == "i"):
+    {
+      toggle_loop()
+      break
+    }
+    case (key == "k"):
+    case (key == "arrowdown"):
+    {
+      change_track((active_track_index.value + 1) % tracks.length)
+      break
+    }
+    case (key == "j"):
+    case (key == "arrowup"):
+    {
+      change_track((active_track_index.value + tracks.length - 1) % tracks.length)
+      break
+    }
+    case (key == "p"):
+    case (key == "d"):
+    {
+      remove_track(active_track_index.value)
+      break
+    }
+    case (key == "?"):
+    {
+      emit("flash_error", "z/y-Goto start \t x/u-Play/Pause \t c/i-Toogle loop \t d/p-Remove track \n a/h-Back 5s \t j-Previous Track \t k-Next track \t s/l-Forward 5s", 10_000)
+      break
+    }
+    case (key == "h"):
+    case (key == "a"):
+    case (key == "arrowleft"):
+    {
+      tracks[active_track_index.value].audio.currentTime = tracks[active_track_index.value].audio.currentTime - 5
+      break
+    }
+    case (key == "s"):
+    case (key == "l"):
+    case (key == "arrowright"):
+    {
+      tracks[active_track_index.value].audio.currentTime = tracks[active_track_index.value].audio.currentTime + 5
+      break
+    }
+    case (0 < keyNum && keyNum <= tracks.length):
+    {
+      change_track(keyNum-1)
+      break
+    }
+    default:
+    {
+      return false
+    }
+  }
+  return true
+}
+
 </script>
 
 <style scoped>
