@@ -3,9 +3,8 @@
     <v-main>
       <MainBody @flash_error="handle_error" />
       <div class="diversions"><a href="https://github.com/cloppingemu/juxtaposeJs" target="_blank">@Github</a></div>
-      <div class="flash-error" ref="error_bar">
-        <pre><b>{{ msg }}</b></pre>
-      </div>
+      <b><div class="flash-error" ref="error_bar">
+      </div></b>
     </v-main>
   </v-app>
 </template>
@@ -23,14 +22,16 @@ import { ref, onMounted } from 'vue'
 import MainBody from '@/views/MainBody.vue'
 
 const error_bar = ref<HTMLDivElement | null>(null)
-const msg = ref("")
 
 onMounted(() => {
-  error_bar.value!.style.bottom = `-${error_bar.value!.scrollHeight}px`
+  if (error_bar.value == null) {
+    return
+  }
+  error_bar.value.style.bottom = `-${error_bar.value.scrollHeight}px`
 })
 
 function handle_error(message: string, timeout: number) {
-  msg.value = message
+  error_bar.value!.innerHTML = message
   error_bar.value!.style.bottom = '0px'
   setTimeout(() => {
     error_bar.value!.style.bottom = `-${error_bar.value!.scrollHeight}px`
@@ -102,5 +103,9 @@ function handle_error(message: string, timeout: number) {
 }
 .diversions > a:hover {
   color: #3fb27f;
+}
+
+.daftTable {
+  width: 100%;
 }
 </style>

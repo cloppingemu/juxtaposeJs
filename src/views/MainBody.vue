@@ -136,7 +136,7 @@ const playback_state = reactive({
 onMounted(() => {
   document.onkeydown = ((e: KeyboardEvent) => {
     const key = e.key.toLocaleLowerCase()
-    if (tracks.length && handleKeypress(key)) {
+    if (handleKeypress(key)) {
       e.preventDefault()
     }
   })
@@ -146,10 +146,15 @@ function toggle_loop() {
   if (!tracks.length) {
     return
   }
+
   playback_state.looping = !playback_state.looping
 }
 
 function go_to_start() {
+  if (!tracks.length) {
+    return
+  }
+
   let seek_target = 0
   if (playback_state.looping) {
     seek_target = loop_range.value[0]
@@ -174,6 +179,10 @@ const tracks = reactive<{
 let max_track_duration = 0
 
 function swap_cards(from: number, to: number) {
+  if (tracks.length < 2) {
+    return
+  }
+
   tracks.splice(to, 0, ...tracks.splice(from, 1))
   if (active_track_index.value == from) {
     active_track_index.value = to
@@ -186,6 +195,10 @@ function swap_cards(from: number, to: number) {
 }
 
 function remove_track(track_index: number) {
+  if (!tracks.length) {
+    return
+  }
+
   if (tracks.length == 1) {
     tracks[0].audio.pause()
     tracks.splice(track_index, 1)
@@ -219,6 +232,10 @@ function seek_mouse_action(down: boolean) {
 }
 
 function change_seek(seek_to: number) {
+  if (tracks.length < 2) {
+    return
+  }
+
   tracks[active_track_index.value].audio.currentTime = seek_to
 }
 
@@ -226,6 +243,7 @@ function change_track(new_track_index: number) {
   if (active_track_index.value == new_track_index) {
     return
   }
+
   tracks[active_track_index.value].audio.pause()
   tracks[new_track_index].audio.currentTime = Math.min(
     tracks[active_track_index.value].audio.currentTime,
@@ -279,7 +297,7 @@ function track_selected() {
 function load_track() {
   const fname = track_adder.value?.files
   if (!fname?.length) {
-    emit("flash_error", "Select a wav or mp3 file to compare", 5_000)
+    emit("flash_error", "Select audio file(s) to compare", 5_000)
     return
   }
   const title = track_title.value?.value
@@ -344,8 +362,8 @@ function scale_seek(track_index: number, seek_pos: number) {
 }
 
 function handleKeypress(key: string) {
-    const keyNum = parseInt(key)
-    switch (true) {
+  const keyNum = parseInt(key)
+  switch (true) {
     case (key == "z"):
     case (key == "y"):
     {
@@ -378,14 +396,32 @@ function handleKeypress(key: string) {
       break
     }
     case (key == "p"):
-    case (key == "d"):
+    case (key == "f"):
     {
       remove_track(active_track_index.value)
       break
     }
+    case (key == "n"):
+    {
+      if (active_track_index.value != 0) {
+        swap_cards(active_track_index.value, active_track_index.value-1)
+      }
+      break
+    }
+    case (key == "m"):
+    {
+      if (active_track_index.value != tracks.length - 1) {
+        swap_cards(active_track_index.value, active_track_index.value+1)
+      }
+      break
+    }
     case (key == "?"):
     {
-      emit("flash_error", "z/y-Goto start \t x/u-Play/Pause \t c/i-Toogle loop \t d/p-Remove track \n a/h-Back 5s \t j-Previous Track \t k-Next track \t s/l-Forward 5s", 10_000)
+      emit("flash_error", `<table class="daftTable"><tr>
+        <td>z/y: Goto start</td> <td>x/u: Play/Pause</td> <td>c/i: Toogle loop</td> <td>f/p: Remove track</td>
+        <td>n: Swap with previous</td></tr><tr><td>a/h: Back 5s</td>
+          <td>j: Previous Track</td> <td>k: Next track</td> <td>s/l: Forward 5s</td> <td>m: Swap with next</td>
+        </tr></table>`, 10_000)
       break
     }
     case (key == "h"):
